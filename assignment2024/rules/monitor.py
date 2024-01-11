@@ -17,14 +17,39 @@ def monitor_today(sdf: SparkDataFrame) -> SparkDataFrame:
     # Get today
     today = datetime.today()
 
+    # Score rules
+    return perform_rule_scoring(sdf, today)
+
+
+def monitor_date(sdf: SparkDataFrame, date_str: str) -> SparkDataFrame:
+    """Score all rules based on given transaction data
+
+    :param sdf: Spark dataframe with transactions.
+    :param date_str: date to monitor for (format dd-mm-yyyy)
+    :return: Spark dataframe with alerts
+    """
+    # Get date from string
+    date = datetime.strptime(date_str, "%d-%m-%Y")
+
+    # Score rules
+    return perform_rule_scoring(sdf, date)
+
+
+def perform_rule_scoring(sdf: SparkDataFrame, date: datetime) -> SparkDataFrame:
+    """Score all rules based on given transaction data
+
+    :param sdf: Spark dataframe with transactions.
+    :param date: date to monitor for
+    :return: Spark dataframe with alerts
+    """
     # Account balance
-    ab = AccountBalance(today, today)
+    ab = AccountBalance(date, date)
     alerts = ab.score(sdf)
-
-    ch = Cheques(today, today)
+    # Cheques
+    ch = Cheques(date, date)
     alerts = alerts.union(ch.score(sdf))
-
-    iob = InOutBehaviour(today, today)
+    # In-out behaviour
+    iob = InOutBehaviour(date, date)
     alerts = alerts.union(iob.score(sdf))
 
     return alerts
