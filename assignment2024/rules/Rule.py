@@ -66,6 +66,7 @@ class Rule:
         sdf = sdf.filter(F.col(c.DATE_ATTRIBUTE_NAME).between(self.date_from, self.date_until))
         # Group per account / per day to return a single alert per day per customer
         sdf = sdf.groupBy(c.ACCOUNT_ATTRIBUTE_NAME, c.DATE_ATTRIBUTE_NAME).count()
+        sdf = sdf.drop("count")
         # Add rule ID to outcome
         sdf = sdf.withColumn(c.RULE_ID_ATTRIBUTE_NAME, F.lit(self.rule_id))
 
