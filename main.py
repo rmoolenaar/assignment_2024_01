@@ -4,6 +4,7 @@ import sys
 from pyspark.sql import SparkSession
 
 from assignment2024.prepare import prepare_data
+from assignment2024.rules.monitor import monitor_today
 
 
 def main(spark: SparkSession, filepath: str) -> None:
@@ -18,7 +19,9 @@ def main(spark: SparkSession, filepath: str) -> None:
     # Prepare transactions
     sdf = prepare_data(sdf)
 
-    print(sdf.count())
+    alerts_sdf = monitor_today(sdf)
+
+    print(alerts_sdf.count())
 
 
 if __name__ == "__main__":
