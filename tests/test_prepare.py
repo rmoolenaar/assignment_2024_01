@@ -6,12 +6,10 @@ from assignment2024.prepare import prepare_data
 
 
 def test_prepare(spark_session: SparkSession) -> None:
-    """"""
+    """Test prepare methods"""
     sdf = spark_session.read.csv("tests/data/test_transactions.csv", sep=";", header=True, inferSchema=True)
     sdf = prepare_data(sdf)
 
-    print(sdf.schema)
-    print(sdf.count())
     found = False
 
     for attr in sdf.schema:
