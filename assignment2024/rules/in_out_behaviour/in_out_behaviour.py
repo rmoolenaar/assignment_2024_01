@@ -4,8 +4,7 @@ from datetime import datetime
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame as SparkDataFrame
 
-import assignment2024.constants as c
-
+from ...constants import DEPOSIT_ATTRIBUTE_NAME, WITHDRAWAL_ATTRIBUTE_NAME
 from ..Rule import Rule
 
 
@@ -31,9 +30,9 @@ class InOutBehaviour(Rule):
         # Get window definition
         w = self.define_window()
         # Get sum of deposits over given period
-        sdf = sdf.withColumn("sum_deposits", F.sum(c.DEPOSIT_ATTRIBUTE_NAME).over(w))
+        sdf = sdf.withColumn("sum_deposits", F.sum(DEPOSIT_ATTRIBUTE_NAME).over(w))
         # Get sum of withdrawals over given period
-        sdf = sdf.withColumn("sum_withdrawals", F.sum(c.WITHDRAWAL_ATTRIBUTE_NAME).over(w))
+        sdf = sdf.withColumn("sum_withdrawals", F.sum(WITHDRAWAL_ATTRIBUTE_NAME).over(w))
         # Calculate ratio between deposits and withdrawals
         sdf = sdf.withColumn("deposits_withdrawals_ratio", F.col("sum_deposits") / F.col("sum_withdrawals"))
         # Calculate sum of all transactions

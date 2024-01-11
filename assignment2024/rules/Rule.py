@@ -8,7 +8,8 @@ from pyspark.sql import DataFrame as SparkDataFrame
 from pyspark.sql import Window, WindowSpec
 from pyspark.sql.types import LongType, TimestampType
 
-import assignment2024.constants as c
+from ..constants import (ACCOUNT_ATTRIBUTE_NAME, CHECK_NO_ATTRIBUTE_NAME, DATE_ATTRIBUTE_NAME, RULE_ID_ATTRIBUTE_NAME,
+                         TRANSACTION_TYPE_CHQ)
 
 
 def days(i: Optional[int]) -> int:
@@ -63,12 +64,12 @@ class Rule:
         sdf = self.score_rule(sdf)
 
         # Filter outcome over the monitoring period
-        sdf = sdf.filter(F.col(c.DATE_ATTRIBUTE_NAME).between(self.date_from, self.date_until))
+        sdf = sdf.filter(F.col(DATE_ATTRIBUTE_NAME).between(self.date_from, self.date_until))
         # Group per account / per day to return a single alert per day per customer
-        sdf = sdf.groupBy(c.ACCOUNT_ATTRIBUTE_NAME, c.DATE_ATTRIBUTE_NAME).count()
+        sdf = sdf.groupBy(ACCOUNT_ATTRIBUTE_NAME, DATE_ATTRIBUTE_NAME).count()
         sdf = sdf.drop("count")
         # Add rule ID to outcome
-        sdf = sdf.withColumn(c.RULE_ID_ATTRIBUTE_NAME, F.lit(self.rule_id))
+        sdf = sdf.withColumn(RULE_ID_ATTRIBUTE_NAME, F.lit(self.rule_id))
 
         return sdf
 
@@ -84,14 +85,14 @@ class Rule:
         :return: Spark dataframe.
         """
         # Filter transaction type equals 'CHQ'
-        if self.transaction_type == c.TRANSACTION_TYPE_CHQ:
-            sdf = sdf.filter(F.col(c.CHECK_NO_ATTRIBUTE_NAME).isNotNull())
+        if self.transaction_type == TRANSACTION_TYPE_CHQ:
+            sdf = sdf.filter(F.col(CHECK_NO_ATTRIBUTE_NAME).isNotNull())
         return sdf
 
     def define_window(self) -> WindowSpec:
         """Specify the window operation for the rules."""
         return (
-            Window.partitionBy(F.col(c.ACCOUNT_ATTRIBUTE_NAME))
-            .orderBy(F.col(c.DATE_ATTRIBUTE_NAME).cast(TimestampType()).cast(LongType()))
+            Window.partitionBy(F.col(ACCOUNT_ATTRIBUTE_NAME))
+            .orderBy(F.col(DATE_ATTRIBUTE_NAME).cast(TimestampType()).cast(LongType()))
             .rangeBetween(-days(self.window_days), Window.currentRow)
         )
