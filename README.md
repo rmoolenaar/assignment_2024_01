@@ -1,4 +1,9 @@
 # Assignment
+## Assumptions
+I have made the following assumptions:
+- As "DATE" and "VALUE DATE" are almost always identical, I will only use the "VALUE DATE" in all calculations.
+- As alert handlers would like to see the rule that triggered the alert, I have grouped all output by account number, date and rule ID. This means a single account can have multiple alerts per day, but only for different rules.
+
 ## Install
 Create virtual environment and then:
 
